@@ -97,17 +97,10 @@ When Suricata fires an SSH scan alert at the network level and Wazuh fires authe
 | Attacker | Kali Linux 192.168.0.50 |
 | Windows agent | 192.168.0.200 |
 
----
-
-## Architecture Diagram
-
-![Architecture](screenshots/architecture.png)
-
----
 
 ## How the Integration Works
 
-Suricata runs in IDS mode — passive network monitoring on enp0s9. Every packet that enters or leaves the network interface is inspected against 49,895 Emerging Threats signatures. When a match is found Suricata writes a structured JSON alert to `/var/log/suricata/eve.json`.
+Suricata runs in IDS mode passive network monitoring on enp0s9. Every packet that enters or leaves the network interface is inspected against 49,895 Emerging Threats signatures. When a match is found Suricata writes a structured JSON alert to `/var/log/suricata/eve.json`.
 
 Wazuh's logcollector reads this file continuously using the `json` log format which parses individual fields — source IP, destination IP, signature name, category, severity — directly into alert properties rather than treating the line as plain text.
 
@@ -221,7 +214,7 @@ After installation and configuration Suricata captured traffic correctly but gen
 After Suricata had been running for some time the eve.json file developed binary content mixed with the JSON output, causing standard grep commands to fail silently. The file was rotated by stopping Suricata, renaming the old file, and restarting to generate a fresh clean output file.
 
 **Too many fields error in Wazuh JSON decoder**
-Suricata's stats events contain over 300 JSON fields — far exceeding Wazuh's default limit of 128 fields per event. This caused repeated "Too many fields for JSON decoder" errors flooding the Wazuh log. The fix involved both removing stats and flow events from the Suricata EVE output configuration and adding suppression rules in Wazuh's local_rules.xml to silently discard any remaining stats events.
+Suricata's stats events contain over 300 JSON fields  far exceeding Wazuh's default limit of 128 fields per event. This caused repeated "Too many fields for JSON decoder" errors flooding the Wazuh log. The fix involved both removing stats and flow events from the Suricata EVE output configuration and adding suppression rules in Wazuh's local_rules.xml to silently discard any remaining stats events.
 
 ---
 
@@ -234,29 +227,22 @@ Phase 3 — Wazuh + AWS  Hybrid cloud and on-premise SOC
 Phase 4 — This project Network layer added — complete HIDS + NIDS stack
 ```
 
-Before this phase every detection capability was at the host level — logs, file integrity, authentication events. This phase adds visibility to what happens on the wire before anything reaches the host. The combination means an attacker cannot approach the network without being detected and cannot interact with the host without being detected. Both layers must be evaded simultaneously for an attack to go unnoticed — a significantly harder challenge.
+Before this phase every detection capability was at the host level logs, file integrity, authentication events. This phase adds visibility to what happens on the wire before anything reaches the host. The combination means an attacker cannot approach the network without being detected and cannot interact with the host without being detected. Both layers must be evaded simultaneously for an attack to go unnoticed — a significantly harder challenge.
 
 ---
 
 ## What Comes Next
 
-Splunk will be the next project — ingesting Suricata EVE JSON, Wazuh alerts, Windows event logs, and Linux auth logs into Splunk and building detection dashboards and correlation searches on top of the rich data generated across all four phases of this series. The data generated in this project will serve as the foundation for Splunk's threat hunting capabilities.
+Splunk will be the next project ingesting Suricata EVE JSON, Wazuh alerts, Windows event logs, and Linux auth logs into Splunk and building detection dashboards and correlation searches on top of the rich data generated across all four phases of this series. The data generated in this project will serve as the foundation for Splunk's threat hunting capabilities.
 
 ---
 
-## References
 
-- [Suricata Documentation](https://docs.suricata.io)
-- [Emerging Threats Open Ruleset](https://rules.emergingthreats.net)
-- [Wazuh Suricata Integration](https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/index.html)
-- [MITRE ATT&CK Framework](https://attack.mitre.org)
-
----
 
 ## Author
 
 **Emmanuel Siamoonga**
-Cloud Infrastructure | Network and Cloud Security | The Copperbelt University, Kitwe, Zambia
+Cloud Infrastructure | Network and Cloud Security
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/emmanuel-siamoonga-98b30929b/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat&logo=github)](https://github.com/Emmanuel-cpp)
